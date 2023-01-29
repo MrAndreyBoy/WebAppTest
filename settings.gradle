@@ -1,0 +1,3 @@
+rootProject.name = 'WebAppTest'
+include 'app'
+
