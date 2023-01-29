@@ -1,9 +1,9 @@
-name: CI to Docker Hub
+name: CI to Docker Hub 
 
 on:
   push:
     branches:
-      - master
+      - main
       - ci
 
 jobs:
@@ -12,11 +12,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
+        
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
-
+        
       - name: Cache Docker layers
         uses: actions/cache@v2
         with:
@@ -24,18 +24,18 @@ jobs:
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
-
+            
       - uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
+          
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
         with:
-          context: ./
-          file: ./Dockerfile
+          context: ./ 
+          file: ./app/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: mrandreyboy/webapptest:latest
@@ -44,15 +44,15 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
-      #      - name: Copy file to host
-      #        uses: appleboy/scp-action@master
-      #        with:
-      #          host: 45.14.48.80
-      #          port: 1222
-      #          username: root
-      #          key: ${{ secrets.belarus_key }}
-      #          source: "migrator/Dockerfile,migrator/sql/*.sql"
-      #          target: "Pulsar"
+      - name: Copy file to host
+        uses: appleboy/scp-action@master
+        with:
+          host: 45.8.230.235
+          port: 22
+          username: root
+          key: ${{ secrets.belarus_key }}
+          source: "migrator/Dockerfile,migrator/sql/*.sql"
+          target: "WebAppTest"
 
       - name: SSH Deploy image
         uses: appleboy/ssh-action@v0.1.4
@@ -69,4 +69,4 @@ jobs:
             docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_ACCESS_TOKEN}
             docker pull mrandreyboy/webapptest:latest
             docker image prune -f
-            cd Wormhole && docker-compose up -d --build
+            cd WebAppTest && docker-compose up -d --build
