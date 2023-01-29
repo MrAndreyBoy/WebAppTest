@@ -1,19 +1,48 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 group 'kz.astana.tbot'
 
 repositories {
+    jcenter()
     mavenCentral()
 }
 
 dependencies {
     implementation "org.telegram:telegrambots:$telegrambotsVersion"
 
+    implementation "org.postgresql:postgresql:$postgresqlDriverVersion"
+    implementation "com.zaxxer:HikariCP:$hikariVersion"
+
+    implementation "ch.qos.logback:logback-core:1.2.3"
+    implementation "ch.qos.logback:logback-classic:1.2.3"
+    implementation "org.slf4j:slf4j-api:1.7.30"
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+
 }
+
+application {
+    mainClassName = 'kz.astana.tbot.App'
+}
+
+jar {
+    group 'build'
+    description 'package fat jar for mtbot with all dependencies'
+    manifest {
+        attributes 'Main-Class': 'kz.astana.tbot.App'
+    }
+    exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/LICENSE'
+    archiveBaseName = 'app'
+    zip64 = true
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 
 test {
     useJUnitPlatform()
