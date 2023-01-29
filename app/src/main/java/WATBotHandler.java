@@ -16,7 +16,7 @@ public class WATBotHandler extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "MyBot";
+        return "WebAppTest";
     }
 
     @Override
